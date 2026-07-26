@@ -1,0 +1,74 @@
+/* ============================================================================
+   login.css
+   Layout for login.html only. Shared tokens/components come from style.css.
+   ============================================================================ */
+
+.auth-screen {
+  position: relative;
+  z-index: 1;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  animation: fadeIn 0.4s var(--ease);
+}
+
+.auth-card {
+  width: 100%;
+  max-width: 400px;
+  background: var(--bg-glass);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid var(--border-soft);
+  border-radius: var(--r-lg);
+  padding: 40px 34px;
+  box-shadow: 0 30px 70px -25px rgba(0, 0, 0, 0.65);
+  animation: cardRise 0.55s var(--ease);
+}
+
+.brand-mark {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 28px;
+}
+.brand-mark .glyph {
+  width: 38px;
+  height: 38px;
+  border-radius: 12px;
+  background: var(--accent-grad);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 800;
+  color: #fff;
+  font-size: 17px;
+  box-shadow: 0 8px 20px -6px rgba(88, 101, 242, 0.55);
+}
+.brand-mark span { font-size: 20px; font-weight: 800; letter-spacing: 0.2px; }
+
+.auth-card h1 { font-size: 22px; margin-bottom: 6px; }
+.auth-card .sub { color: var(--text-mid); font-size: 13.5px; margin-bottom: 24px; }
+
+.forgot-row {
+  display: flex;
+  justify-content: flex-end;
+  margin: -8px 0 16px;
+}
+.forgot-row button {
+  font-size: 12.5px;
+  color: var(--text-mid);
+  font-weight: 600;
+  transition: color var(--dur) var(--ease);
+}
+.forgot-row button:hover { color: var(--accent-2); }
+
+.auth-switch {
+  text-align: center;
+  margin-top: 22px;
+  font-size: 13.5px;
+  color: var(--text-mid);
+}
+.auth-switch a { color: var(--accent-2); font-weight: 700; }
+.auth-switch a:hover { text-decoration: underline; }
