@@ -162,7 +162,7 @@ function renderConversationList(filterTerm = "") {
         <div class="conv-item ${isActive ? "active" : ""}" data-chat-id="${chat.id}" data-partner-uid="${partnerUid}">
           <div class="avatar">
             ${initialsOf(partner.displayName)}
-            <span class="status-dot ${partner.online ? "online" : "}"></span>
+            <span class="status-dot ${partner.online ? "online" : ""}"></span>
           </div>
           <div class="conv-body">
             <div class="conv-row">
