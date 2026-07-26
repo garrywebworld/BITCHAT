@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Create account — BITCHAT</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/style.css" />
+  <link rel="stylesheet" href="css/register.css" />
+</head>
+<body>
+  <div id="loading-overlay"><div class="spinner"></div></div>
+  <div id="toast-stack"></div>
+
+  <main class="auth-screen">
+    <div class="auth-card">
+      <div class="brand-mark">
+        <div class="glyph">B</div>
+        <span>BITCHAT</span>
+      </div>
+
+      <h1>Create your account</h1>
+      <p class="sub">Join BITCHAT and start messaging in seconds.</p>
+
+      <div id="form-error" class="form-error hidden"></div>
+
+      <form id="register-form" novalidate>
+        <div class="field">
+          <label for="username">Username</label>
+          <input id="username" type="text" placeholder="Ada Lovelace" autocomplete="name" required />
+        </div>
+        <div class="field">
+          <label for="email">Email</label>
+          <input id="email" type="email" placeholder="you@example.com" autocomplete="email" required />
+        </div>
+        <div class="field">
+          <label for="password">Password</label>
+          <input id="password" type="password" placeholder="At least 6 characters" autocomplete="new-password" required minlength="6" />
+        </div>
+        <div class="field">
+          <label for="confirm-password">Confirm password</label>
+          <input id="confirm-password" type="password" placeholder="Re-enter your password" autocomplete="new-password" required minlength="6" />
+        </div>
+        <p id="password-hint" class="password-hint hidden"></p>
+
+        <button type="submit" class="btn-primary" id="register-btn">
+          <span class="btn-label">Register</span>
+        </button>
+      </form>
+
+      <div class="divider-row">or</div>
+
+      <button type="button" class="btn-google" id="google-btn">
+        <svg viewBox="0 0 48 48"><path fill="#FFC107" d="M43.6 20.5H42V20H24v8h11.3C33.7 32.9 29.3 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.9 1.2 8 3.1l5.7-5.7C34.6 6.1 29.6 4 24 4 12.9 4 4 12.9 4 24s8.9 20 20 20 20-8.9 20-20c0-1.3-.1-2.7-.4-3.5z"/><path fill="#FF3D00" d="M6.3 14.7l6.6 4.8C14.6 15.5 18.9 12.7 24 12.7c3.1 0 5.9 1.2 8 3.1l5.7-5.7C34.6 6.1 29.6 4 24 4 16.3 4 9.7 8.3 6.3 14.7z"/><path fill="#4CAF50" d="M24 44c5.2 0 10-2 13.5-5.2l-6.2-5.2C29.3 35.4 26.8 36 24 36c-5.3 0-9.7-3.4-11.3-8.1l-6.5 5C9.6 39.6 16.3 44 24 44z"/><path fill="#1976D2" d="M43.6 20.5H42V20H24v8h11.3c-.8 2.3-2.3 4.3-4.2 5.6l6.2 5.2C40.9 36.1 44 30.5 44 24c0-1.3-.1-2.7-.4-3.5z"/></svg>
+        <span>Continue with Google</span>
+      </button>
+
+      <p class="auth-switch">Already have an account? <a href="login.html">Log in</a></p>
+    </div>
+  </main>
+
+  <script type="module">
+    import { redirectIfAuthenticated, registerUser, loginWithGoogle, friendlyAuthError } from "./js/auth.js";
+    import { $, showToast, setPageLoading, setButtonLoading, showFormError, clearFormError } from "./js/ui.js";
+
+    // If already logged in, this immediately redirects to chat.html.
+    redirectIfAuthenticated(() => setPageLoading(false));
+
+    const form = $("register-form");
+    const errorBox = $("form-error");
+    const registerBtn = $("register-btn");
+    const googleBtn = $("google-btn");
+    const passwordInput = $("password");
+    const confirmInput = $("confirm-password");
+    const hint = $("password-hint");
+
+    function updatePasswordHint() {
+      if (!confirmInput.value) {
+        hint.classList.add("hidden");
+        return;
+      }
+      hint.classList.remove("hidden");
+      if (passwordInput.value === confirmInput.value) {
+        hint.textContent = "Passwords match.";
+        hint.className = "password-hint match";
+      } else {
+        hint.textContent = "Passwords do not match.";
+        hint.className = "password-hint mismatch";
+      }
+    }
+    passwordInput.addEventListener("input", updatePasswordHint);
+    confirmInput.addEventListener("input", updatePasswordHint);
+
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      clearFormError(errorBox);
+
+      const username = $("username").value.trim();
+      const email = $("email").value.trim();
+      const password = passwordInput.value;
+      const confirmPassword = confirmInput.value;
+
+      if (!username) {
+        showFormError(errorBox, "Please enter a username.");
+        return;
+      }
+      if (password !== confirmPassword) {
+        showFormError(errorBox, "Passwords do not match. Please re-enter them.");
+        return;
+      }
+      if (password.length < 6) {
+        showFormError(errorBox, "Password must be at least 6 characters long.");
+        return;
+      }
+
+      setButtonLoading(registerBtn, true, "Creating account...", "Register");
+      try {
+        await registerUser({ username, email, password });
+        showToast(`Welcome, ${username}!`);
+        window.location.href = "chat.html";
+      } catch (err) {
+        console.error("[register.html] Registration failed:", err);
+        showFormError(errorBox, friendlyAuthError(err));
+      } finally {
+        setButtonLoading(registerBtn, false, "Creating account...", "Register");
+      }
+    });
+
+    googleBtn.addEventListener("click", async () => {
+      clearFormError(errorBox);
+      setButtonLoading(googleBtn, true, "Connecting to Google...", "Continue with Google");
+      try {
+        await loginWithGoogle();
+        showToast("Account created with Google.");
+        window.location.href = "chat.html";
+      } catch (err) {
+        console.error("[register.html] Google sign-in failed:", err);
+        showFormError(errorBox, friendlyAuthError(err));
+      } finally {
+        setButtonLoading(googleBtn, false, "Connecting to Google...", "Continue with Google");
+      }
+    });
+  </script>
+</body>
+</html>

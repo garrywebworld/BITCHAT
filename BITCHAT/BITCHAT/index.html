@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>BITCHAT — Loading…</title>
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+  <!-- This page never renders any real UI — it just decides where to send
+       the visitor based on whether they are currently authenticated. -->
+  <div id="loading-overlay">
+    <div class="spinner"></div>
+  </div>
+  <div id="toast-stack"></div>
+
+  <script type="module">
+    import { auth } from "./js/firebase.js";
+    import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-auth.js";
+
+    console.info("[index.html] Checking authentication state...");
+    onAuthStateChanged(auth, (user) => {
+      if (user) {
+        console.info("[index.html] User is authenticated — redirecting to chat.html");
+        window.location.replace("chat.html");
+      } else {
+        console.info("[index.html] No authenticated user — redirecting to login.html");
+        window.location.replace("login.html");
+      }
+    }, (err) => {
+      console.error("[index.html] onAuthStateChanged error:", err);
+      document.body.innerHTML =
+        `<div style="font-family:monospace;color:#f04562;padding:24px;">` +
+        `Authentication check failed: ${err.message}</div>`;
+    });
+  </script>
+</body>
+</html>
